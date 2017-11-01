@@ -113,19 +113,25 @@ mqttCon.on('message', (topic, message) => {
               });
             } else if (robotState === 2) {
               robot.pauseCleaning(() => {
-                robot.sendToBase((err, result) => {
-                  if (err) console.error('Dock ' + err, result);
-                  else console.log('Dock ' + result);
-                  stateUpdate();
-                });
-              });
-            } else if (robotState === 1) {
-              robot.startCleaning(() => {
-                robot.pauseCleaning(() => {
+                stateUpdate(() => {
                   robot.sendToBase((err, result) => {
                     if (err) console.error('Dock ' + err, result);
                     else console.log('Dock ' + result);
                     stateUpdate();
+                  });
+                });
+              });
+            } else if (robotState === 1) {
+              robot.startCleaning(() => {
+                stateUpdate(() => {
+                  robot.pauseCleaning(() => {
+                    stateUpdate(() => {
+                      robot.sendToBase((err, result) => {
+                        if (err) console.error('Dock ' + err, result);
+                        else console.log('Dock ' + result);
+                        stateUpdate();
+                      });
+                    });
                   });
                 });
               });
