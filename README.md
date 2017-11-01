@@ -16,4 +16,4 @@ mqtt:
 
     docker build -t kobold2mqtt .
 
-    docker run --env km200config=/data/config.yml  -v /Volumes/data/smarthome:/data -it kobold2mqtt 
+    docker run --env koboldconfig=/data/config.yml  -v /Volumes/data/smarthome:/data -it kobold2mqtt 
