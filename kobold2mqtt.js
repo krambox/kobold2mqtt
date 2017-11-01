@@ -21,8 +21,10 @@ mqttCon.on('connect', () => {
 });
 
 var robot;
+var robotState = 0;
+var robotDock = true;
 
-function stateUpdate () {
+function stateUpdate(done) {
   if (robot) {
     robot.getState(function (error, result) {
       if (!error) {
@@ -33,8 +35,10 @@ function stateUpdate () {
           isScheduleEnabled: robot.isScheduleEnabled,
           charge: robot.charge,
           state: result.state, // cleaning:2 //pause:3 //stop:1
-          action: result.action // cleaning:1 /pause:1 //stop:0
+          action: result.action // cleaning:1 /pause:1 //stop:0 //docking:4 charging:6
         };
+        robotState = result.state;
+        robotDock = robot.isDocked;
         switch (result.state) {
           case 1:
             state.state = 'stopped';
@@ -51,6 +55,9 @@ function stateUpdate () {
         mqttCon.publish('vr200/state/' + robot.name, JSON.stringify(state), { retain: true }, function () {
           // console.log(topic, value)
         });
+        if (done) {
+          done();
+        }
       } else {
         console.error(error);
       }
@@ -96,10 +103,34 @@ mqttCon.on('message', (topic, message) => {
         });
         break;
       case 'dock':
-        robot.sendToBase((err, result) => {
-          if (err) console.error('Dock ' + err, result);
-          else console.log('Dock ' + result);
-          stateUpdate();
+        stateUpdate(() => {
+          if (!robotDock) {
+            if (robotState === 3) {
+              robot.sendToBase((err, result) => {
+                if (err) console.error('Dock ' + err, result);
+                else console.log('Dock ' + result);
+                stateUpdate();
+              });
+            } else if (robotState === 2) {
+              robot.pauseCleaning(() => {
+                robot.sendToBase((err, result) => {
+                  if (err) console.error('Dock ' + err, result);
+                  else console.log('Dock ' + result);
+                  stateUpdate();
+                });
+              });
+            } else if (robotState === 1) {
+              robot.startCleaning(() => {
+                robot.pauseCleaning(() => {
+                  robot.sendToBase((err, result) => {
+                    if (err) console.error('Dock ' + err, result);
+                    else console.log('Dock ' + result);
+                    stateUpdate();
+                  });
+                });
+              });
+            }
+          }
         });
         break;
       default:
