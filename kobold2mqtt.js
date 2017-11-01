@@ -52,7 +52,7 @@ function stateUpdate(done) {
           default:
             state.state = result.state;
         }
-        mqttCon.publish('vr200/state/' + robot.name, JSON.stringify(state), { retain: true }, function () {
+        mqttCon.publish('vr200/status/' + robot.name, JSON.stringify(state), { retain: true }, function () {
           // console.log(topic, value)
         });
         if (done) {
