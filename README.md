@@ -1,4 +1,4 @@
-# mqtt-km200
+# VR200 to mqtt
 
 ## Config
 
@@ -11,6 +11,12 @@ kobold:
 mqtt:
   server: mqtt://<hostname>
 ```
+
+## Start
+
+Set env variable koboldconfig to config.yml
+
+Start kobold2mqtt.js
 
 ## Docker
 
