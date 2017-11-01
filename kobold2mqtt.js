@@ -22,7 +22,7 @@ mqttCon.on('connect', () => {
 
 var robot;
 
-function stateUpdate() {
+function stateUpdate () {
   if (robot) {
     robot.getState(function (error, result) {
       if (!error) {
@@ -35,6 +35,19 @@ function stateUpdate() {
           state: result.state, // cleaning:2 //pause:3 //stop:1
           action: result.action // cleaning:1 /pause:1 //stop:0
         };
+        switch (result.state) {
+          case 1:
+            state.state = 'stopped';
+            break;
+          case 2:
+            state.state = 'running';
+            break;
+          case 3:
+            state.state = 'paused';
+            break;
+          default:
+            state.state = result.state;
+        }
         mqttCon.publish('vr200/state/' + robot.name, JSON.stringify(state), { retain: true }, function () {
           // console.log(topic, value)
         });
@@ -79,6 +92,13 @@ mqttCon.on('message', (topic, message) => {
         robot.resumeCleaning((err, result) => {
           if (err) console.error('Resume ' + err, result);
           else console.log('Resume ' + result);
+          stateUpdate();
+        });
+        break;
+      case 'dock':
+        robot.sendToBase((err, result) => {
+          if (err) console.error('Dock ' + err, result);
+          else console.log('Dock ' + result);
           stateUpdate();
         });
         break;
