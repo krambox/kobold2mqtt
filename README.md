@@ -1,5 +1,11 @@
 # VR200 to mqtt
 
+[![NPM version](https://badge.fury.io/js/kobold2mqtt.svg)](http://badge.fury.io/js/kobold2mqtt)
+[![Dependency Status](https://img.shields.io/gemnasium/krambox/kobold2mqtt.svg?maxAge=2592000)](https://gemnasium.com/github.com/krambox/kobold2mqtt)
+[![Build Status](https://travis-ci.org/krambox/kobold2mqtt.svg?branch=master)](https://travis-ci.org/krambox/kobold2mqtt)
+[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Written and (C) Kai Kramer on top of https://github.com/nicoh88/node-kobold from Arne Blumentritt and Nico Hartung. Build with https://github.com/hobbyquaker/xyz2mqtt-skeleton from Sebastian Raff.
 
 Provided under the terms of the MIT license.
