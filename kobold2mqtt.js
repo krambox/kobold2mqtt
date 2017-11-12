@@ -1,33 +1,50 @@
 #!/usr/bin/env node
+var pkg = require('./package.json');
 var kobold = require('node-kobold');
-var mqtt = require('mqtt');
-require('require-yaml');
+var Mqtt = require('mqtt');
+var log = require('yalm');
+var config = require('./config.js');
 
-// Load config from path in koboldconfig
-console.log('Starting kobold to mqtt');
-if (process.env.koboldconfig == null) {
-  console.error('Missing enviroment variable km200config');
-  process.exit(-1);
-}
-console.log('Config file: ' + process.env.koboldconfig);
-var config = require(process.env.koboldconfig);
-console.log(config.kobold);
+var mqttConnected;
 
-console.log('Connect mqtt: ' + config.mqtt.server);
-var mqttCon = mqtt.connect(config.mqtt.server);
+log.setLevel(config.verbosity);
 
-mqttCon.on('connect', () => {
-  mqttCon.subscribe('vr200/set/#');
+log.info(pkg.name + ' ' + pkg.version + ' starting');
+log.info('mqtt trying to connect', config.url);
+
+var mqtt = Mqtt.connect(config.url, {will: {topic: config.name + '/connected', payload: '0', retain: true}});
+
+mqtt.on('connect', function () {
+  mqttConnected = true;
+
+  log.info('mqtt connected', config.url);
+  mqtt.publish(config.name + '/connected', '1', {retain: true});
+
+  log.info('mqtt subscribe', config.name + '/set/#');
+  mqtt.subscribe(config.name + '/set/#');
+});
+
+mqtt.on('close', function () {
+  if (mqttConnected) {
+    mqttConnected = false;
+    log.info('mqtt closed ' + config.url);
+  }
+});
+
+mqtt.on('error', function (err) {
+  log.error('mqtt', err);
 });
 
 var robot;
 var robotState = 0;
 var robotDock = true;
 
-function stateUpdate(done) {
+function stateUpdate (done) {
+  log.debug('request state');
   if (robot) {
     robot.getState(function (error, result) {
       if (!error) {
+        log.debug('state', result);
         var state = {
           ts: Math.floor(new Date() / 1000),
           isCahrging: robot.isCharging,
@@ -52,53 +69,54 @@ function stateUpdate(done) {
           default:
             state.state = result.state;
         }
-        mqttCon.publish('vr200/status/' + robot.name, JSON.stringify(state), { retain: true }, function () {
-          // console.log(topic, value)
+        mqtt.publish(config.name + '/status/' + robot.name, JSON.stringify(state), { retain: true }, function () {
+          log.debug('Publich to:' + config.name + '/status/' + robot.name + ' value: ' + JSON.stringify(state));
         });
         if (done) {
           done();
         }
       } else {
-        console.error(error);
+        log.error(error);
       }
     });
   }
 }
 
-mqttCon.on('message', (topic, message) => {
-  console.log(topic, message.toString());
-  if (topic.startsWith('vr200/set/')) {
-    let name = topic.substring(10);
+mqtt.on('message', (topic, message) => {
+  log.info(topic, message.toString());
+  let prefix = config.name + '/set/';
+  if (topic.startsWith(prefix)) {
+    let name = topic.substring(prefix.length);
     if (name !== robot.name) {
-      console.error('Wrong robot: ' + name + ' found ' + robot.name);
+      log.error('Wrong robot: ' + name + ' found ' + robot.name);
     }
     let value = message.toString();
     switch (value) {
       case 'start':
         robot.startCleaning((err, result) => {
-          if (err) console.error('Start ' + err, result);
-          else console.log('Start ' + result);
+          if (err) log.error('Start ' + err, result);
+          else log.info('Start ' + result);
           stateUpdate();
         });
         break;
       case 'stop':
         robot.stopCleaning((err, result) => {
-          if (err) console.error('Stop ' + err, result);
-          else console.log('Stop ' + result);
+          if (err) log.error('Stop ' + err, result);
+          else log.info('Stop ' + result);
           stateUpdate();
         });
         break;
       case 'pause':
         robot.pauseCleaning((err, result) => {
-          if (err) console.error('Pause ' + err, result);
-          else console.log('Pause ' + result);
+          if (err) log.error('Pause ' + err, result);
+          else log.info('Pause ' + result);
           stateUpdate();
         });
         break;
       case 'resume':
         robot.resumeCleaning((err, result) => {
-          if (err) console.error('Resume ' + err, result);
-          else console.log('Resume ' + result);
+          if (err) log.error('Resume ' + err, result);
+          else log.info('Resume ' + result);
           stateUpdate();
         });
         break;
@@ -107,16 +125,16 @@ mqttCon.on('message', (topic, message) => {
           if (!robotDock) {
             if (robotState === 3) {
               robot.sendToBase((err, result) => {
-                if (err) console.error('Dock ' + err, result);
-                else console.log('Dock ' + result);
+                if (err) log.error('Dock ' + err, result);
+                else log.info('Dock ' + result);
                 stateUpdate();
               });
             } else if (robotState === 2) {
               robot.pauseCleaning(() => {
                 stateUpdate(() => {
                   robot.sendToBase((err, result) => {
-                    if (err) console.error('Dock ' + err, result);
-                    else console.log('Dock ' + result);
+                    if (err) log.error('Dock ' + err, result);
+                    else log.info('Dock ' + result);
                     stateUpdate();
                   });
                 });
@@ -127,8 +145,8 @@ mqttCon.on('message', (topic, message) => {
                   robot.pauseCleaning(() => {
                     stateUpdate(() => {
                       robot.sendToBase((err, result) => {
-                        if (err) console.error('Dock ' + err, result);
-                        else console.log('Dock ' + result);
+                        if (err) log.error('Dock ' + err, result);
+                        else log.info('Dock ' + result);
                         stateUpdate();
                       });
                     });
@@ -140,7 +158,7 @@ mqttCon.on('message', (topic, message) => {
         });
         break;
       default:
-        console.error('Unknown command: ' + value);
+        log.error('Unknown command: ' + value);
         break;
     }
   }
@@ -149,26 +167,26 @@ mqttCon.on('message', (topic, message) => {
 var client = new kobold.Client();
 
 // authorize
-console.log('Connect kr200');
-client.authorize(config.kobold.user, config.kobold.password, false, function (error) {
+log.info('Connect kr200');
+client.authorize(config.email, config.password, false, function (error) {
   if (error) {
-    console.error(error);
+    log.error(error);
     return;
   }
-  console.log('connected');
+  log.info('connected');
   // get your robots
   client.getRobots(function (error, robots) {
     if (error) {
-      console.error(error);
+      log.error(error);
       return;
     }
     if (robots.length) {
       robot = robots[0];
 
-      console.log('Found: ' + robot.name);
+      log.info('Found: ' + robot.name);
       stateUpdate();
     } else {
-      console.error('No robots found!');
+      log.error('No robots found!');
     }
   });
 });
