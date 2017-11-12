@@ -31,10 +31,10 @@
   "license": "MIT",
   "homepage": "https://github.com/krambox/kobold2mqtt#readme",
   "dependencies": {
-    "mqtt": "^2.13.1",
+    "mqtt": "^2.14.0",
     "node-kobold": "^0.1.2",
-    "yalm": "^4.0.2",
-    "yargs": "^6.5.0"
+    "yalm": "^4.1.0",
+    "yargs": "^6.6.0"
   },
   "devDependencies": {
     "pre-commit": "^1.2.2",
