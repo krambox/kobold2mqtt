@@ -183,7 +183,7 @@ function authorizeVorwerk () {
         return;
       }
       if (robots.length) {
-        mqtt.publish(config.name + '/connected', '1', {retain: true});
+        mqtt.publish(config.name + '/connected', '2', {retain: true});
         robot = robots[0];
 
         log.info('Found: ' + robot.name);
