@@ -12,7 +12,7 @@ WORKDIR /root/app
 ENTRYPOINT ["/sbin/tini", "--"]
 # copy project file
 COPY package.json .
- 
+COPY package-lock.json . 
 #
 # ---- Dependencies ----
 FROM base AS dependencies
@@ -32,6 +32,7 @@ WORKDIR /root/app
 # copy production node_modules
 COPY --from=dependencies /root/app/prod_node_modules ./node_modules
 # copy app sources
-COPY . .
-VOLUME ["/data"]
+COPY package.json .
+COPY config.js .
+COPY kobold2mqtt.js .
 CMD ./kobold2mqtt.js 
