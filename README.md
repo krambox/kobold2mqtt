@@ -13,7 +13,7 @@ Provided under the terms of the MIT license.
 
 ## Overview 
 
-kobold2mqtt is a gateway between a Kobold VR200 Buderus internet gateway and MQTT with the  https://github.com/mqtt-smarthome topic and payload format.
+kobold2mqtt is a gateway between a Kobold VR200 vacuum and MQTT with the  https://github.com/mqtt-smarthome topic and payload format.
 
 ## Installation
 
