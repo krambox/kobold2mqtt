@@ -10,7 +10,7 @@
   },
   "engineStrict": true,
   "scripts": {
-    "test": "semistandard && exit 0",
+    "test": "",
     "start": "node ./kobold2mqtt.js",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
@@ -39,7 +39,8 @@
   "devDependencies": {
     "pre-commit": "^1.2.2",
     "semantic-release": "^15.13.31",
-    "semistandard": "^14.2.0"
+    "semistandard": "^14.2.0",
+    "semistandard-format": "^3.0.0"
   },
   "pre-commit": [
     "test"
