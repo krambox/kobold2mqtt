@@ -60,4 +60,3 @@ Changing the state is possible with the following set values on topic vr200/set/
 - pause
 - resume
 - doc
-# readability-markdown-
