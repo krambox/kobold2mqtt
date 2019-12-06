@@ -11,9 +11,10 @@ Written and (C) Kai Kramer on top of https://github.com/nicoh88/node-kobold from
 
 Provided under the terms of the MIT license.
 
-## Overview 
+## Overview
 
 kobold2mqtt is a gateway between a Kobold VR200 vacuum and MQTT with the  https://github.com/mqtt-smarthome topic and payload format.
+
 
 ## Installation
 
@@ -23,7 +24,7 @@ The recommended away is via docker hub.
 
 Or via direct call
 
-    ./km200mqtt.js -u mqtt://192.168.1.13 -k 192.168.1.162 -e <EMail> -p <pwd>
+    ./kobold200mqtt.js -u mqtt://192.168.1.13 -k 192.168.1.162 -e <EMail> -p <pwd>
 
 ## Config
 
@@ -35,7 +36,6 @@ KM200_password=<Vorwerk password>
 KM200_email=<Vorwerk username>
 ```
 
-
 ## Start
 
 Set env variable koboldconfig to config.yml
@@ -46,4 +46,19 @@ Start kobold2mqtt.js
 
     docker build -t kobold2mqtt .
 
-    docker run --env-file ./vk200.env -it kobold2mqtt 
+    docker run --env-file ./vk200.env -it kobold2mqtt
+
+## Topics
+
+kobold2mqtt respects the smarthome2mqtt scheme and exposes the vacuum cleaners state exemplarily:
+
+    vr200/status/<Kobold Name> {"ts":1575615863,"isCahrging":false,"isDocked":true,"isScheduleEnabled":true,"charge":93,"state":"stopped","action":0}
+
+Changing the state is possible with the following set values on topic vr200/set/<Kobold Name>:
+
+- start
+- stop
+- pause
+- resume
+- doc
+# readability-markdown-
