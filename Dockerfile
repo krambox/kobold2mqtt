@@ -1,6 +1,6 @@
 #
 # ---- Dependencies ----
-FROM mhart/alpine-node:8 AS dependencies
+FROM mhart/alpine-node:12 AS dependencies
 RUN apk add --no-cache python build-base
 
 WORKDIR /root/app
