@@ -49,7 +49,7 @@ function stateUpdate (done) {
         log.debug('state', result);
         var state = {
           ts: Math.floor(new Date() / 1000),
-          isCahrging: robot.isCharging,
+          isCharging: robot.isCharging,
           isDocked: robot.isDocked,
           isScheduleEnabled: robot.isScheduleEnabled,
           charge: robot.charge,
