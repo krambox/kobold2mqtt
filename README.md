@@ -15,26 +15,40 @@ Provided under the terms of the MIT license.
 
 kobold2mqtt is a gateway between a Kobold VR200 vacuum and MQTT with the  https://github.com/mqtt-smarthome topic and payload format.
 
+## Prerequisites
+
+If you use the MyKobold app, you will probably need to login via OAuth2. For this you will have to 
+obtain a token. Instructions for obtaining such a token can be found
+[here](https://github.com/nicoh88/node-kobold).
 
 ## Installation
 
 The recommended away is via docker hub.
 
-    docker run --env-file ./vk200.env -it km200 krambox/kobold2mqtt
+    docker run --rm --env-file ./vr200.env -it krambox/kobold2mqtt
 
 Or via direct call
 
-    ./kobold200mqtt.js -u mqtt://192.168.1.13 -k 192.168.1.162 -e <EMail> -p <pwd>
+    ./kobold2mqtt.js -u mqtt://192.168.1.13 -e <EMail> -p <pwd>
+
+Or via direct call (OAuth2 token)
+
+    ./kobold2mqtt.js -u mqtt://192.168.1.13 -t <token>
 
 ## Config
 
 Example Env file for docker run --env-file
 
-```
-VR200_url=mqtt://192.168.1.13
-KM200_password=<Vorwerk password>
-KM200_email=<Vorwerk username>
-```
+    VR200_url=mqtt://192.168.1.13
+    VR200_password=<Vorwerk password>
+    VR200_email=<Vorwerk username>
+
+Example Env file for docker run --env-file with OAuth2
+
+
+    VR200_url=mqtt://192.168.1.13
+    VR200_token=<Vorwerk token>
+
 
 ## Start
 
@@ -46,13 +60,24 @@ Start kobold2mqtt.js
 
     docker build -t kobold2mqtt .
 
-    docker run --env-file ./vk200.env -it kobold2mqtt
+    docker run --rm --env-file ./vr200.env -it kobold2mqtt
 
 ## Topics
 
 kobold2mqtt respects the smarthome2mqtt scheme and exposes the vacuum cleaners state exemplarily:
 
-    vr200/status/<Kobold Name> {"ts":1575615863,"isCahrging":false,"isDocked":true,"isScheduleEnabled":true,"charge":93,"state":"stopped","action":0}
+    Topic: vr200/status/<Kobold Name> 
+    
+    Message:
+    {
+      "ts": 1575615863,
+      "isCharging": false,
+      "isDocked": true,
+      "isScheduleEnabled":true,
+      "charge":93,
+      "state":"stopped",
+      "action":0
+    }
 
 Changing the state is possible with the following set values on topic vr200/set/<Kobold Name>:
 
@@ -61,3 +86,10 @@ Changing the state is possible with the following set values on topic vr200/set/
 - pause
 - resume
 - doc
+
+So to start the Vorwerk200, publish this message:
+
+    Topic: vr200/set/<Kobold Name>
+    Message: start
+
+
