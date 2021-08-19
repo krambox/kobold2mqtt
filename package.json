@@ -1,7 +1,7 @@
 {
   "name": "kobold2mqtt",
   "version": "0.0.0-development",
-  "description": "vorwerk vk200 to mqtt bridge for mqtt-smarthome",
+  "description": "vorwerk vr200 to mqtt bridge for mqtt-smarthome",
   "main": "kobold2mqtt.js",
   "preferGlobal": true,
   "bin": "./kobold2mqtt.js",
@@ -25,14 +25,14 @@
     "mqtt",
     "smarthome",
     "vorwerk",
-    "vk200"
+    "vr200"
   ],
   "author": "Kai Kramer",
   "license": "MIT",
   "homepage": "https://github.com/krambox/kobold2mqtt#readme",
   "dependencies": {
     "mqtt": "^3.0.0",
-    "node-kobold": "^0.1.3",
+    "node-kobold": "^0.2.0",
     "yalm": "^4.1.0",
     "yargs": "^15.0.2"
   },

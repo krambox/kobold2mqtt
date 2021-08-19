@@ -169,29 +169,41 @@ mqtt.on('message', (topic, message) => {
 var client = new kobold.Client();
 function authorizeVorwerk () {
   // authorize
-  log.info('Connect kr200');
-  client.authorize(config.email, config.password, false, function (error) {
+  log.info('Connect vr200');
+
+  if (config.token) {
+    log.info('Using OAuth2');
+    client.setToken(config.token);
+    getRobots();
+  } else {
+    log.info('Using basic auth');
+    client.authorize(config.email, config.password, false, function (error) {
+      if (error) {
+        log.error(error);
+        return;
+      }
+      getRobots();
+    });
+  }
+}
+
+function getRobots() {
+  // get your robots
+  client.getRobots(function (error, robots) {
     if (error) {
       log.error(error);
       return;
     }
     log.info('connected');
-    // get your robots
-    client.getRobots(function (error, robots) {
-      if (error) {
-        log.error(error);
-        return;
-      }
-      if (robots.length) {
-        mqtt.publish(config.name + '/connected', '2', {retain: true});
-        robot = robots[0];
+    if (robots.length) {
+      mqtt.publish(config.name + '/connected', '2', {retain: true});
+      robot = robots[0];
 
-        log.info('Found: ' + robot.name);
-        stateUpdate();
-        setInterval(stateUpdate, 60000);
-      } else {
-        log.error('No robots found!');
-      }
-    });
+      log.info('Found: ' + robot.name);
+      stateUpdate();
+      setInterval(stateUpdate, 60000);
+    } else {
+      log.error('No robots found!');
+    }
   });
 }
