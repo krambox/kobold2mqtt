@@ -1,4 +1,5 @@
 node_modules/
-vk200.env
+vr200.env
 .vscode/launch.json
 kobold.env
+.idea/
