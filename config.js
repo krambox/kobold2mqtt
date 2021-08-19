@@ -20,7 +20,7 @@ var config = require('yargs')
   .default({
     'u': 'mqtt://127.0.0.1',
     'n': 'vr200',
-    'v': 'debug'
+    'v': 'info'
   })
   .version()
   .help('help')
